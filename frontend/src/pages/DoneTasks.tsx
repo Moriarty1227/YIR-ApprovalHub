@@ -1,10 +1,20 @@
 import { useState, useEffect } from 'react'
 import { taskApi } from '@/api'
 import type { Task } from '@/types'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
+import { Badge } from '@/components/ui/badge'
 
-const actionMap: Record<number, { text: string; color: string }> = {
-    1: { text: '同意', color: 'text-green-600' },
-    2: { text: '拒绝', color: 'text-red-600' },
+const actionMap: Record<number, { text: string; variant: "success" | "destructive" | "default" | "secondary" | "outline" | "warning" }> = {
+    1: { text: '同意', variant: 'success' },
+    2: { text: '拒绝', variant: 'destructive' },
 }
 
 export default function DoneTasks() {
@@ -29,64 +39,57 @@ export default function DoneTasks() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">已办任务</h2>
+            <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold tracking-tight">已办任务</h2>
+            </div>
 
-            {loading ? (
-                <div className="text-center py-20 text-gray-500">加载中...</div>
-            ) : tasks.length === 0 ? (
-                <div className="text-center py-20 text-gray-500">暂无已办任务</div>
-            ) : (
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    申请单号
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    标题
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    申请人
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    审批结果
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    审批意见
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    完成时间
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {tasks.map((task) => (
-                                <tr key={task.taskId} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm text-gray-900">{task.appNo}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">{task.title}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        {task.applicantName}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm">
-                                        <span className={actionMap[task.action || 1]?.color}>
-                                            {actionMap[task.action || 1]?.text}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                        {task.comment || '-'}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                        {task.finishTime
-                                            ? new Date(task.finishTime).toLocaleString('zh-CN')
-                                            : '-'}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            <Card>
+                <CardHeader>
+                    <CardTitle>任务历史</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="text-center py-10 text-muted-foreground">加载中...</div>
+                    ) : tasks.length === 0 ? (
+                        <div className="text-center py-10 text-muted-foreground">暂无已办任务</div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>申请单号</TableHead>
+                                    <TableHead>标题</TableHead>
+                                    <TableHead>申请人</TableHead>
+                                    <TableHead>审批结果</TableHead>
+                                    <TableHead>审批意见</TableHead>
+                                    <TableHead>完成时间</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {tasks.map((task) => (
+                                    <TableRow key={task.taskId}>
+                                        <TableCell>{task.appNo}</TableCell>
+                                        <TableCell>{task.title}</TableCell>
+                                        <TableCell>{task.applicantName}</TableCell>
+                                        <TableCell>
+                                            <Badge variant={actionMap[task.action || 1]?.variant}>
+                                                {actionMap[task.action || 1]?.text}
+                                            </Badge>
+                                        </TableCell>
+                                        <TableCell className="text-muted-foreground">
+                                            {task.comment || '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {task.finishTime
+                                                ? new Date(task.finishTime).toLocaleString('zh-CN')
+                                                : '-'}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
+                </CardContent>
+            </Card>
         </div>
     )
 }

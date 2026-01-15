@@ -1,29 +1,38 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { applicationApi } from '@/api'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 export default function CreateReimburse() {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
-        expenseType: 1,
-        amount: 0,
+        amount: '',
+        type: '差旅费',
         reason: '',
-        invoiceAttachment: '',
-        occurDate: '',
+        attachment: '',
     })
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!form.amount || !form.reason || !form.invoiceAttachment) {
+        if (!form.amount || !form.reason) {
             alert('请填写必填项')
             return
         }
 
         setLoading(true)
         try {
-            await applicationApi.createReimburse(form)
+            await applicationApi.createReimburse({
+                amount: Number(form.amount),
+                type: form.type,
+                reason: form.reason,
+                attachment: form.attachment
+            })
             alert('提交成功')
             navigate('/dashboard/applications')
         } catch (error: any) {
@@ -35,102 +44,69 @@ export default function CreateReimburse() {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">创建报销申请</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            费用类型 *
-                        </label>
-                        <select
-                            value={form.expenseType}
-                            onChange={(e) => setForm({ ...form, expenseType: Number(e.target.value) })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value={1}>差旅费</option>
-                            <option value={2}>餐饮费</option>
-                            <option value={3}>办公费</option>
-                            <option value={4}>其他</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            报销金额 *
-                        </label>
-                        <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">¥</span>
-                            <input
+            <Card>
+                <CardHeader>
+                    <CardTitle>创建报销申请</CardTitle>
+                    <CardDescription>请填写真实的报销信息</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                            <Label>报销金额 (元) *</Label>
+                            <Input
                                 type="number"
+                                min="0"
                                 step="0.01"
                                 value={form.amount}
-                                onChange={(e) => setForm({ ...form, amount: Number(e.target.value) })}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                onChange={(e) => setForm({ ...form, amount: e.target.value })}
                                 placeholder="0.00"
                             />
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            发生日期
-                        </label>
-                        <input
-                            type="date"
-                            value={form.occurDate}
-                            onChange={(e) => setForm({ ...form, occurDate: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label>报销类别</Label>
+                            <Input
+                                type="text"
+                                value={form.type}
+                                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            发票附件 *
-                        </label>
-                        <input
-                            type="text"
-                            value={form.invoiceAttachment}
-                            onChange={(e) => setForm({ ...form, invoiceAttachment: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="请上传发票后填写文件路径，如：/upload/invoice_001.pdf"
-                        />
-                        <p className="mt-1 text-sm text-gray-500">
-                            提示：实际项目中这里应该是文件上传组件
-                        </p>
-                    </div>
+                        <div className="space-y-2">
+                            <Label>费用说明 *</Label>
+                            <Textarea
+                                value={form.reason}
+                                onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                                placeholder="请详细说明费用产生的详情"
+                                rows={4}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            报销事由 *
-                        </label>
-                        <textarea
-                            value={form.reason}
-                            onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                            rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="请详细说明报销原因"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label>附件链接</Label>
+                            <Input
+                                type="url"
+                                value={form.attachment}
+                                onChange={(e) => setForm({ ...form, attachment: e.target.value })}
+                                placeholder="请输入附件下载链接"
+                            />
+                        </div>
 
-                    <div className="flex gap-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50"
-                        >
-                            {loading ? '提交中...' : '提交申请'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/dashboard/applications')}
-                            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            取消
-                        </button>
-                    </div>
-                </form>
-            </div>
+                        <div className="flex gap-4 pt-4">
+                            <Button type="submit" className="flex-1" disabled={loading}>
+                                {loading ? '提交中...' : '提交申请'}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => navigate('/dashboard/applications')}
+                            >
+                                取消
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     )
 }

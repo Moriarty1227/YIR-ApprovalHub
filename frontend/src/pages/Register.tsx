@@ -2,6 +2,17 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/authStore'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent,
+    CardFooter,
+    CardDescription
+} from '@/components/ui/card'
 
 export default function Register() {
     const navigate = useNavigate()
@@ -42,104 +53,87 @@ export default function Register() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-600 to-purple-700 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-2">注册账号</h1>
-                    <p className="text-gray-600">创建您的审批系统账号</p>
-                </div>
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+            <Card className="w-full max-w-md shadow-lg">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-2xl font-bold">注册账号</CardTitle>
+                    <CardDescription>创建您的审批系统账号</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="username">用户名 *</Label>
+                            <Input
+                                id="username"
+                                value={form.username}
+                                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                                placeholder="3-50个字符"
+                            />
+                        </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            用户名 *
-                        </label>
-                        <input
-                            type="text"
-                            value={form.username}
-                            onChange={(e) => setForm({ ...form, username: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="3-50个字符"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="realName">真实姓名 *</Label>
+                            <Input
+                                id="realName"
+                                value={form.realName}
+                                onChange={(e) => setForm({ ...form, realName: e.target.value })}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            真实姓名 *
-                        </label>
-                        <input
-                            type="text"
-                            value={form.realName}
-                            onChange={(e) => setForm({ ...form, realName: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="password">密码 *</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={form.password}
+                                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                                placeholder="6-20个字符"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            密码 *
-                        </label>
-                        <input
-                            type="password"
-                            value={form.password}
-                            onChange={(e) => setForm({ ...form, password: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="6-20个字符"
-                        />
-                    </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="confirmPassword">确认密码 *</Label>
+                            <Input
+                                id="confirmPassword"
+                                type="password"
+                                value={form.confirmPassword}
+                                onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            确认密码 *
-                        </label>
-                        <input
-                            type="password"
-                            value={form.confirmPassword}
-                            onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="phone">手机号</Label>
+                                <Input
+                                    id="phone"
+                                    type="tel"
+                                    value={form.phone}
+                                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">邮箱</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    value={form.email}
+                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                />
+                            </div>
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            手机号
-                        </label>
-                        <input
-                            type="tel"
-                            value={form.phone}
-                            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            邮箱
-                        </label>
-                        <input
-                            type="email"
-                            value={form.email}
-                            onChange={(e) => setForm({ ...form, email: e.target.value })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
-                    >
-                        {loading ? '注册中...' : '注册'}
-                    </button>
-                </form>
-
-                <div className="mt-6 text-center">
-                    <span className="text-gray-600">已有账号？</span>
-                    <Link to="/login" className="text-blue-600 hover:underline ml-2">
+                        <Button type="submit" className="w-full mt-4" disabled={loading}>
+                            {loading ? '注册中...' : '注册'}
+                        </Button>
+                    </form>
+                </CardContent>
+                <CardFooter className="justify-center text-sm text-gray-500">
+                    已有账号？
+                    <Link to="/login" className="text-primary hover:underline ml-1">
                         立即登录
                     </Link>
-                </div>
-            </div>
+                </CardFooter>
+            </Card>
         </div>
     )
 }

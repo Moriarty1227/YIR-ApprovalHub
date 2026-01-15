@@ -2,6 +2,24 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { applicationApi } from '@/api'
 import dayjs from 'dayjs'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card'
 
 export default function CreateLeave() {
     const navigate = useNavigate()
@@ -59,96 +77,90 @@ export default function CreateLeave() {
 
     return (
         <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">创建请假申请</h2>
+            <Card>
+                <CardHeader>
+                    <CardTitle>创建请假申请</CardTitle>
+                    <CardDescription>请填写真实的请假信息</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="space-y-2">
+                            <Label>请假类型 *</Label>
+                            <Select
+                                value={String(form.leaveType)}
+                                onValueChange={(val) => setForm({ ...form, leaveType: Number(val) })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="选择请假类型" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1">事假</SelectItem>
+                                    <SelectItem value="2">病假</SelectItem>
+                                    <SelectItem value="3">年假</SelectItem>
+                                    <SelectItem value="4">调休</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            请假类型 *
-                        </label>
-                        <select
-                            value={form.leaveType}
-                            onChange={(e) => setForm({ ...form, leaveType: Number(e.target.value) })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        >
-                            <option value={1}>事假</option>
-                            <option value={2}>病假</option>
-                            <option value={3}>年假</option>
-                            <option value={4}>调休</option>
-                        </select>
-                    </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label>开始时间 *</Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={form.startTime}
+                                    onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                                />
+                            </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                开始时间 *
-                            </label>
-                            <input
-                                type="datetime-local"
-                                value={form.startTime}
-                                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                            <div className="space-y-2">
+                                <Label>结束时间 *</Label>
+                                <Input
+                                    type="datetime-local"
+                                    value={form.endTime}
+                                    onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>请假天数 *</Label>
+                            <Input
+                                type="number"
+                                step="0.5"
+                                value={form.days}
+                                onChange={(e) => setForm({ ...form, days: Number(e.target.value) })}
                             />
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                结束时间 *
-                            </label>
-                            <input
-                                type="datetime-local"
-                                value={form.endTime}
-                                onChange={(e) => setForm({ ...form, endTime: e.target.value })}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        <div className="space-y-2">
+                            <Label>请假事由 *</Label>
+                            <Textarea
+                                value={form.reason}
+                                onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                                placeholder="请详细说明请假原因"
+                                rows={4}
                             />
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            请假天数 *
-                        </label>
-                        <input
-                            type="number"
-                            step="0.5"
-                            value={form.days}
-                            onChange={(e) => setForm({ ...form, days: Number(e.target.value) })}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            请假事由 *
-                        </label>
-                        <textarea
-                            value={form.reason}
-                            onChange={(e) => setForm({ ...form, reason: e.target.value })}
-                            rows={4}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                            placeholder="请详细说明请假原因"
-                        />
-                    </div>
-
-                    <div className="flex gap-4">
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50"
-                        >
-                            {loading ? '提交中...' : '提交申请'}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => navigate('/dashboard/applications')}
-                            className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50"
-                        >
-                            取消
-                        </button>
-                    </div>
-                </form>
-            </div>
+                        <div className="flex gap-4 pt-4">
+                            <Button
+                                type="submit"
+                                className="flex-1"
+                                disabled={loading}
+                            >
+                                {loading ? '提交中...' : '提交申请'}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={() => navigate('/dashboard/applications')}
+                            >
+                                取消
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
         </div>
     )
 }

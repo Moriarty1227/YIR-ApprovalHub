@@ -1,6 +1,28 @@
 import { useState, useEffect } from 'react'
 import { taskApi } from '@/api'
 import type { Task } from '@/types'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table'
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function TodoTasks() {
     const [tasks, setTasks] = useState<Task[]>([])
@@ -47,130 +69,105 @@ export default function TodoTasks() {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">待办任务</h2>
+            <div className="flex justify-between items-center">
+                <h2 className="text-3xl font-bold tracking-tight">待办任务</h2>
+            </div>
 
-            {loading ? (
-                <div className="text-center py-20 text-gray-500">加载中...</div>
-            ) : tasks.length === 0 ? (
-                <div className="text-center py-20 text-gray-500">暂无待办任务</div>
-            ) : (
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                    <table className="w-full">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    申请单号
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    标题
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    申请人
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    当前节点
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    接收时间
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                                    操作
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {tasks.map((task) => (
-                                <tr key={task.taskId} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 text-sm text-gray-900">{task.appNo}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">{task.title}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">
-                                        {task.applicantName}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm text-gray-900">{task.nodeName}</td>
-                                    <td className="px-6 py-4 text-sm text-gray-500">
-                                        {new Date(task.createTime).toLocaleString('zh-CN')}
-                                    </td>
-                                    <td className="px-6 py-4 text-sm">
-                                        <button
-                                            onClick={() => setSelectedTask(task)}
-                                            className="text-blue-600 hover:underline"
-                                        >
-                                            审批
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            )}
+            <Card>
+                <CardHeader>
+                    <CardTitle>任务列表</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    {loading ? (
+                        <div className="text-center py-10 text-muted-foreground">加载中...</div>
+                    ) : tasks.length === 0 ? (
+                        <div className="text-center py-10 text-muted-foreground">暂无待办任务</div>
+                    ) : (
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>申请单号</TableHead>
+                                    <TableHead>标题</TableHead>
+                                    <TableHead>申请人</TableHead>
+                                    <TableHead>当前节点</TableHead>
+                                    <TableHead>接收时间</TableHead>
+                                    <TableHead>操作</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {tasks.map((task) => (
+                                    <TableRow key={task.taskId}>
+                                        <TableCell>{task.appNo}</TableCell>
+                                        <TableCell>{task.title}</TableCell>
+                                        <TableCell>
+                                            <Badge variant="outline">{task.applicantName}</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Badge variant="secondary">{task.nodeName}</Badge>
+                                        </TableCell>
+                                        <TableCell>
+                                            {new Date(task.createTime).toLocaleString('zh-CN')}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button
+                                                variant="link"
+                                                onClick={() => setSelectedTask(task)}
+                                            >
+                                                审批
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    )}
+                </CardContent>
+            </Card>
 
-            {/* 审批对话框 */}
-            {selectedTask && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white rounded-lg p-8 max-w-md w-full">
-                        <h3 className="text-xl font-bold mb-4">审批：{selectedTask.title}</h3>
+            <Dialog open={!!selectedTask} onOpenChange={(open) => !open && setSelectedTask(null)}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>审批：{selectedTask?.title}</DialogTitle>
+                        <DialogDescription>
+                            请仔细核对申请信息后进行审批操作。
+                        </DialogDescription>
+                    </DialogHeader>
 
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    审批动作 *
-                                </label>
-                                <div className="flex gap-4">
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            checked={approveForm.action === 1}
-                                            onChange={() => setApproveForm({ ...approveForm, action: 1 })}
-                                            className="mr-2"
-                                        />
-                                        同意
-                                    </label>
-                                    <label className="flex items-center">
-                                        <input
-                                            type="radio"
-                                            checked={approveForm.action === 2}
-                                            onChange={() => setApproveForm({ ...approveForm, action: 2 })}
-                                            className="mr-2"
-                                        />
-                                        拒绝
-                                    </label>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <Label>审批动作</Label>
+                            <RadioGroup
+                                value={String(approveForm.action)}
+                                onValueChange={(val) => setApproveForm({ ...approveForm, action: Number(val) })}
+                                className="flex gap-4"
+                            >
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="1" id="r1" />
+                                    <Label htmlFor="r1">同意</Label>
                                 </div>
-                            </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="2" id="r2" />
+                                    <Label htmlFor="r2">拒绝</Label>
+                                </div>
+                            </RadioGroup>
+                        </div>
 
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    审批意见（选填）
-                                </label>
-                                <textarea
-                                    value={approveForm.comment}
-                                    onChange={(e) =>
-                                        setApproveForm({ ...approveForm, comment: e.target.value })
-                                    }
-                                    rows={4}
-                                    className="w-full px-4 py-2 border rounded-lg"
-                                    placeholder="请输入审批意见"
-                                />
-                            </div>
-
-                            <div className="flex gap-4">
-                                <button
-                                    onClick={handleApprove}
-                                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-                                >
-                                    提交
-                                </button>
-                                <button
-                                    onClick={() => setSelectedTask(null)}
-                                    className="px-6 py-2 border rounded-lg hover:bg-gray-50"
-                                >
-                                    取消
-                                </button>
-                            </div>
+                        <div className="grid gap-2">
+                            <Label>审批意见</Label>
+                            <Textarea
+                                value={approveForm.comment}
+                                onChange={(e) => setApproveForm({ ...approveForm, comment: e.target.value })}
+                                placeholder="请输入审批意见..."
+                            />
                         </div>
                     </div>
-                </div>
-            )}
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setSelectedTask(null)}>取消</Button>
+                        <Button onClick={handleApprove}>提交</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }
