@@ -108,17 +108,6 @@ export default function ApprovalHistory() {
 
     const renderDateTime = (value?: string) => (value ? new Date(value).toLocaleString('zh-CN') : '-')
 
-    const handleWithdraw = async (appId: number) => {
-        if (!confirm('确定要撤回此申请吗？')) return
-
-        try {
-            await applicationApi.withdraw(appId)
-            alert('撤回成功')
-            fetchApplications()
-        } catch (error: any) {
-            alert(error?.message || '撤回失败')
-        }
-    }
 
     return (
         <div className="space-y-6">
@@ -253,16 +242,7 @@ export default function ApprovalHistory() {
                                         <TableCell>{renderDateTime(app.submitTime)}</TableCell>
                                         <TableCell className="space-x-2">
                                             <Button variant="link" size="sm">查看</Button>
-                                            {app.status === 1 && (
-                                                <Button
-                                                    variant="link"
-                                                    size="sm"
-                                                    className="text-destructive"
-                                                    onClick={() => handleWithdraw(app.appId)}
-                                                >
-                                                    撤回
-                                                </Button>
-                                            )}
+                                           
                                         </TableCell>
                                     </TableRow>
                                 ))}

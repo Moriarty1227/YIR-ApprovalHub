@@ -1,7 +1,7 @@
 import { useAuthStore } from '@/store/authStore'
-import AdminDashboard from '@/pages/AdminDashboard'
-import ApproverDashboard from '@/pages/ApproverDashboard'
-import UserDashboard from '@/pages/UserDashboard'
+import AdminDashboard from '@/pages/Admin/AdminDashboard'
+import ApproverDashboard from '@/pages/Approver/ApproverDashboard'
+import UserDashboard from '@/pages/User/UserDashboard'
 
 /**
  * 基于角色的Dashboard路由组件

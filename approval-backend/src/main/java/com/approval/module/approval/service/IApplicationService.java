@@ -33,9 +33,9 @@ public interface IApplicationService {
         /**
          * 查询审批历史
          */
-        Page<ApplicationHistoryVo> getMyHistoryApplications(Long userId, Integer pageNum, Integer pageSize,
-            LocalDateTime startTime, LocalDateTime endTime, String approverName,
-            Integer leaveType, Integer expenseType, Integer status);
+            Page<ApplicationHistoryVo> getMyHistoryApplications(Long userId, Integer pageNum, Integer pageSize,
+                String appType, LocalDateTime startTime, LocalDateTime endTime, String approverName,
+                Integer leaveType, Integer expenseType, Integer status);
 
         /**
          * 获取申请统计

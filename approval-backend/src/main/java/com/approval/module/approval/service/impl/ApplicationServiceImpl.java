@@ -177,8 +177,8 @@ public class ApplicationServiceImpl implements IApplicationService {
     }
 
     @Override
-    public Page<ApplicationHistoryVo> getMyHistoryApplications(Long userId, Integer pageNum, Integer pageSize,
-            LocalDateTime startTime, LocalDateTime endTime, String approverName,
+        public Page<ApplicationHistoryVo> getMyHistoryApplications(Long userId, Integer pageNum, Integer pageSize,
+            String appType, LocalDateTime startTime, LocalDateTime endTime, String approverName,
             Integer leaveType, Integer expenseType, Integer status) {
         long current = (pageNum == null || pageNum <= 0) ? 1L : pageNum;
         long size = (pageSize == null || pageSize <= 0) ? 10L : pageSize;
@@ -193,6 +193,10 @@ public class ApplicationServiceImpl implements IApplicationService {
             wrapper.eq(Application::getStatus, status);
         } else {
             wrapper.in(Application::getStatus, HISTORY_STATUSES);
+        }
+
+        if (appType != null && !appType.isEmpty()) {
+            wrapper.eq(Application::getAppType, appType);
         }
 
         List<Application> applications = applicationMapper.selectList(wrapper);

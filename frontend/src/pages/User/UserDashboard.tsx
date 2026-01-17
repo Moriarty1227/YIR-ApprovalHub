@@ -1,17 +1,18 @@
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import MyApplications from './MyApplications'
-import TodoTasks from './TodoTasks'
-import DoneTasks from './DoneTasks'
+import MyApplications from '../MyApplications'
+import ApprovalHistory from './ApprovalHistory'
+import CreateLeave from './CreateLeave'
+import CreateReimburse from './CreateReimburse'
 import { Button } from '@/components/ui/button'
-import { LogOut, FileText, CheckSquare, ClipboardList } from 'lucide-react'
+import { LogOut, FileText, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
- * 审批人Dashboard
- * 功能：我的申请、待办任务、已办任务
+ * 普通员工Dashboard
+ * 功能：我的申请、创建申请
  */
-export default function ApproverDashboard() {
+export default function UserDashboard() {
     const navigate = useNavigate()
     const location = useLocation()
     const { user, clearAuth } = useAuthStore()
@@ -23,8 +24,7 @@ export default function ApproverDashboard() {
 
     const navItems = [
         { href: '/dashboard/applications', label: '我的申请', icon: FileText },
-        { href: '/dashboard/todo', label: '待办任务', icon: CheckSquare },
-        { href: '/dashboard/done', label: '已办任务', icon: ClipboardList },
+        { href: '/dashboard/approval-history', label: '审批历史', icon: FileText },
     ]
 
     return (
@@ -77,10 +77,11 @@ export default function ApproverDashboard() {
                     <div className="max-w-5xl mx-auto">
                         <Routes>
                             <Route path="applications" element={<MyApplications />} />
-                            <Route path="todo" element={<TodoTasks />} />
-                            <Route path="done" element={<DoneTasks />} />
+                            <Route path="approval-history" element={<ApprovalHistory />} />
+                            <Route path="create/leave" element={<CreateLeave />} />
+                            <Route path="create/reimburse" element={<CreateReimburse />} />
                             <Route
-                                path="/"
+                                index
                                 element={
                                     <div className="text-center py-20 space-y-4">
                                         <h2 className="text-3xl font-bold text-gray-800">
@@ -90,11 +91,19 @@ export default function ApproverDashboard() {
                                             请从左侧菜单选择功能开始工作
                                         </p>
                                         <div className="flex justify-center gap-4 mt-8">
-                                            <Button onClick={() => navigate('/dashboard/todo')}>
-                                                处理待办任务
-                                            </Button>
-                                            <Button variant="outline" onClick={() => navigate('/dashboard/applications')}>
+                                            <Button onClick={() => navigate('/dashboard/applications')}>
                                                 查看我的申请
+                                            </Button>
+                                             <Button onClick={() => navigate('/dashboard/approval-history')}>
+                                                查看审批历史
+                                            </Button>
+                                            <Button variant="outline" onClick={() => navigate('/dashboard/create/leave')}>
+                                                <Plus className="w-4 h-4 mr-2" />
+                                                创建请假申请
+                                            </Button>
+                                            <Button variant="outline" onClick={() => navigate('/dashboard/create/reimburse')}>
+                                                <Plus className="w-4 h-4 mr-2" />
+                                                创建报销申请
                                             </Button>
                                         </div>
                                     </div>

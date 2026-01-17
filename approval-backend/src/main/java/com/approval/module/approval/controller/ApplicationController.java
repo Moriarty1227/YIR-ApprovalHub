@@ -72,6 +72,7 @@ public class ApplicationController {
     public Result<Page<ApplicationHistoryVo>> getMyHistoryApplications(
             @RequestParam(defaultValue = "1") Integer pageNum,
             @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String appType,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startTime,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endTime,
             @RequestParam(required = false) String approverName,
@@ -81,7 +82,7 @@ public class ApplicationController {
             @RequestHeader("Authorization") String token) {
         Long userId = getUserIdFromToken(token);
         Page<ApplicationHistoryVo> page = applicationService.getMyHistoryApplications(userId, pageNum, pageSize,
-                startTime, endTime, approverName, leaveType, expenseType, status);
+            appType, startTime, endTime, approverName, leaveType, expenseType, status);
         return Result.success(page);
     }
 

@@ -5,6 +5,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 
 export default function CreateReimburse() {
@@ -12,15 +19,25 @@ export default function CreateReimburse() {
     const [loading, setLoading] = useState(false)
     const [form, setForm] = useState({
         amount: '',
-        type: '差旅费',
+        expenseType: '1',
         reason: '',
-        attachment: '',
+        invoiceAttachment: '',
+        occurDate: '',
     })
+
+    const expenseTypeOptions = [
+        { label: '差旅交通费', value: '1' },
+        { label: '业务招待费', value: '2' },
+        { label: '日常办公费', value: '3' },
+        { label: '培训教育费', value: '4' },
+        { label: '服务采购费', value: '5' },
+        { label: '其他', value: '6' },
+    ]
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        if (!form.amount || !form.reason) {
+        if (!form.amount || !form.reason || !form.invoiceAttachment || !form.occurDate) {
             alert('请填写必填项')
             return
         }
@@ -29,9 +46,10 @@ export default function CreateReimburse() {
         try {
             await applicationApi.createReimburse({
                 amount: Number(form.amount),
-                type: form.type,
+                expenseType: Number(form.expenseType),
                 reason: form.reason,
-                attachment: form.attachment
+                invoiceAttachment: form.invoiceAttachment,
+                occurDate: form.occurDate,
             })
             alert('提交成功')
             navigate('/dashboard/applications')
@@ -64,11 +82,30 @@ export default function CreateReimburse() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>报销类别</Label>
+                            <Label>报销类别 *</Label>
+                            <Select
+                                value={form.expenseType}
+                                onValueChange={(val) => setForm({ ...form, expenseType: val })}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="请选择类别" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {expenseTypeOptions.map((option) => (
+                                        <SelectItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label>费用发生日期 *</Label>
                             <Input
-                                type="text"
-                                value={form.type}
-                                onChange={(e) => setForm({ ...form, type: e.target.value })}
+                                type="date"
+                                value={form.occurDate}
+                                onChange={(e) => setForm({ ...form, occurDate: e.target.value })}
                             />
                         </div>
 
@@ -83,14 +120,16 @@ export default function CreateReimburse() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>附件链接</Label>
+                            <Label>发票附件链接 *</Label>
                             <Input
                                 type="url"
-                                value={form.attachment}
-                                onChange={(e) => setForm({ ...form, attachment: e.target.value })}
-                                placeholder="请输入附件下载链接"
+                                value={form.invoiceAttachment}
+                                onChange={(e) => setForm({ ...form, invoiceAttachment: e.target.value })}
+                                placeholder="请输入发票附件链接"
                             />
                         </div>
+
+                        
 
                         <div className="flex gap-4 pt-4">
                             <Button type="submit" className="flex-1" disabled={loading}>
