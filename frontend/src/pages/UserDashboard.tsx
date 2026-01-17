@@ -81,7 +81,7 @@ export default function UserDashboard() {
                             <Route path="create/leave" element={<CreateLeave />} />
                             <Route path="create/reimburse" element={<CreateReimburse />} />
                             <Route
-                                path="/"
+                                index
                                 element={
                                     <div className="text-center py-20 space-y-4">
                                         <h2 className="text-3xl font-bold text-gray-800">
@@ -93,6 +93,9 @@ export default function UserDashboard() {
                                         <div className="flex justify-center gap-4 mt-8">
                                             <Button onClick={() => navigate('/dashboard/applications')}>
                                                 查看我的申请
+                                            </Button>
+                                             <Button onClick={() => navigate('/dashboard/approval-history')}>
+                                                查看审批历史
                                             </Button>
                                             <Button variant="outline" onClick={() => navigate('/dashboard/create/leave')}>
                                                 <Plus className="w-4 h-4 mr-2" />
