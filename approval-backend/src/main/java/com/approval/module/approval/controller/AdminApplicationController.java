@@ -53,7 +53,9 @@ public class AdminApplicationController {
 
         Page<Application> appPage = applicationMapper.selectPage(page, wrapper);
 
-        List<Long> userIds = appPage.getRecords().stream()
+        List<Application> records = appPage.getRecords();
+
+        List<Long> userIds = records.stream()
                 .map(Application::getApplicantId)
                 .distinct()
                 .collect(Collectors.toList());
@@ -61,13 +63,48 @@ public class AdminApplicationController {
         Map<Long, User> userMap = userMapper.selectBatchIds(userIds).stream()
                 .collect(Collectors.toMap(User::getUserId, u -> u));
 
+        List<Long> leaveAppIds = records.stream()
+            .filter(app -> "leave".equals(app.getAppType()))
+            .map(Application::getAppId)
+            .collect(Collectors.toList());
+        List<Long> reimburseAppIds = records.stream()
+            .filter(app -> "reimburse".equals(app.getAppType()))
+            .map(Application::getAppId)
+            .collect(Collectors.toList());
+
+        Map<Long, LeaveApplication> leaveMap = leaveAppIds.isEmpty()
+            ? java.util.Collections.emptyMap()
+            : leaveApplicationMapper.selectList(new LambdaQueryWrapper<LeaveApplication>()
+                .in(LeaveApplication::getAppId, leaveAppIds))
+                .stream()
+                .collect(Collectors.toMap(LeaveApplication::getAppId, leave -> leave));
+
+        Map<Long, ReimburseApplication> reimburseMap = reimburseAppIds.isEmpty()
+            ? java.util.Collections.emptyMap()
+            : reimburseApplicationMapper.selectList(new LambdaQueryWrapper<ReimburseApplication>()
+                .in(ReimburseApplication::getAppId, reimburseAppIds))
+                .stream()
+                .collect(Collectors.toMap(ReimburseApplication::getAppId, reimburse -> reimburse));
+
         Page<ApplicationVo> voPage = new Page<>(appPage.getCurrent(), appPage.getSize(), appPage.getTotal());
-        voPage.setRecords(appPage.getRecords().stream().map(app -> {
+        voPage.setRecords(records.stream().map(app -> {
             ApplicationVo vo = new ApplicationVo();
             org.springframework.beans.BeanUtils.copyProperties(app, vo);
             User user = userMap.get(app.getApplicantId());
             vo.setApplicantName(user != null ? user.getRealName() : "");
             vo.setDeptName("技术部");
+
+            if ("leave".equals(app.getAppType())) {
+            LeaveApplication leave = leaveMap.get(app.getAppId());
+            if (leave != null) {
+                vo.setLeaveType(leave.getLeaveType());
+            }
+            } else if ("reimburse".equals(app.getAppType())) {
+            ReimburseApplication reimburse = reimburseMap.get(app.getAppId());
+            if (reimburse != null) {
+                vo.setExpenseType(reimburse.getExpenseType());
+            }
+            }
             return vo;
         }).collect(Collectors.toList()));
 

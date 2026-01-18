@@ -36,6 +36,23 @@ export interface Application {
     currentNode: string
     submitTime: string
     finishTime?: string
+    leaveType?: number
+    expenseType?: number
+}
+
+export interface ApplicationEntity {
+    appId: number
+    appNo: string
+    appType: string
+    title: string
+    applicantId: number
+    deptId?: number
+    status: number
+    currentNode?: string
+    submitTime?: string
+    finishTime?: string
+    createTime?: string
+    updateTime?: string
 }
 
 export interface ApplicationHistory {
@@ -57,6 +74,42 @@ export interface ApplicationHistory {
     submitTime: string
     approveTime?: string
     finishTime?: string
+}
+
+export interface LeaveApplicationDetail {
+    leaveId: number
+    appId: number
+    leaveType: number
+    startTime?: string
+    endTime?: string
+    days?: number
+    reason?: string
+    attachment?: string
+}
+
+export interface ReimburseApplicationDetail {
+    reimburseId: number
+    appId: number
+    expenseType: number
+    amount?: number
+    reason?: string
+    invoiceAttachment?: string
+    occurDate?: string
+}
+
+export interface ApprovalHistoryRecord {
+    historyId: number
+    nodeName?: string
+    approverName?: string
+    action?: number
+    comment?: string
+    approveTime?: string
+}
+
+export interface ApplicationDetailResponse {
+    application: ApplicationEntity
+    detail?: LeaveApplicationDetail | ReimburseApplicationDetail
+    history: ApprovalHistoryRecord[]
 }
 
 export interface ApplicationSummary {

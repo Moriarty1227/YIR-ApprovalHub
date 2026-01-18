@@ -23,8 +23,8 @@ export default function ApproverDashboard() {
 
     const navItems = [
         { href: '/dashboard/applications', label: '我的申请', icon: FileText },
-        { href: '/dashboard/todo', label: '待办任务', icon: CheckSquare },
-        { href: '/dashboard/done', label: '已办任务', icon: ClipboardList },
+        { href: '/dashboard/todo', label: '待审批任务', icon: CheckSquare },
+        { href: '/dashboard/done', label: '已审批任务', icon: ClipboardList },
     ]
 
     return (

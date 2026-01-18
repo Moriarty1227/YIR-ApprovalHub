@@ -127,6 +127,7 @@ export default function CreateLeave() {
                             <Input
                                 type="number"
                                 step="0.5"
+                                readOnly
                                 value={form.days}
                                 onChange={(e) => setForm({ ...form, days: Number(e.target.value) })}
                             />
@@ -138,6 +139,7 @@ export default function CreateLeave() {
                                 value={form.reason}
                                 onChange={(e) => setForm({ ...form, reason: e.target.value })}
                                 placeholder="请详细说明请假原因"
+                                className="rounded-xl border-[#090a0a] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.08)] focus-visible:ring-1 focus-visible:ring-[#5b8ef9]"
                                 rows={4}
                             />
                         </div>

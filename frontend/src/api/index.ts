@@ -7,6 +7,7 @@ import type {
     Application,
     ApplicationHistory,
     ApplicationSummary,
+    ApplicationDetailResponse,
     CreateLeaveRequest,
     CreateReimburseRequest,
     Task,
@@ -67,7 +68,7 @@ export const applicationApi = {
 
     // 查询申请详情
     getDetail: (appId: number) =>
-        request.get(`/application/${appId}`),
+        request.get<any, ApplicationDetailResponse>(`/application/${appId}`),
 
     // 撤回申请
     withdraw: (appId: number) =>
