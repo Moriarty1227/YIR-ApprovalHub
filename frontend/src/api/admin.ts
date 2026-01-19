@@ -22,7 +22,7 @@ export const adminApi = {
         deptId?: number
         status?: number
     }) =>
-        request.get<any, { records: AdminUser[]; total: number }>('/admin/users', { params }),
+        request.get<{ records: AdminUser[]; total: number }>('/admin/users', { params }),
 
     getUserById: (userId: number) =>
         request.get<AdminUser>(`/admin/users/${userId}`),
@@ -42,7 +42,7 @@ export const adminApi = {
         deptName?: string
         status?: number
     }) =>
-        request.get<any, { records: AdminDept[]; total: number }>('/admin/depts', { params }),
+        request.get<{ records: AdminDept[]; total: number }>('/admin/depts', { params }),
 
     getDeptById: (deptId: number) =>
         request.get<AdminDept>(`/admin/depts/${deptId}`),
@@ -62,7 +62,7 @@ export const adminApi = {
         postName?: string
         status?: number
     }) =>
-        request.get<any, { records: AdminPost[]; total: number }>('/admin/posts', { params }),
+        request.get<{ records: AdminPost[]; total: number }>('/admin/posts', { params }),
 
     getPostById: (postId: number) =>
         request.get<AdminPost>(`/admin/posts/${postId}`),
@@ -101,7 +101,7 @@ export const adminApi = {
         status?: number
         appNo?: string
     }) =>
-        request.get<any, { records: Application[]; total: number }>('/admin/applications', { params }),
+        request.get<{ records: Application[]; total: number }>('/admin/applications', { params }),
 
     getApplicationDetail: (appId: number) =>
         request.get(`/admin/applications/${appId}`),

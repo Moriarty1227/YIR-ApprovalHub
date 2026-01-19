@@ -22,7 +22,8 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { useAuthStore } from '@/store/authStore'
-import type { ApproverOption } from '@/types'
+import type { ApproverOption, UploadFileResult } from '@/types'
+import { AttachmentUpload } from '@/components/AttachmentUpload'
 
 export default function CreateLeave() {
     const navigate = useNavigate()
@@ -41,6 +42,7 @@ export default function CreateLeave() {
     const [submitBlockReason, setSubmitBlockReason] = useState<string | null>(null)
     const [timeDialogOpen, setTimeDialogOpen] = useState(false)
     const [timeDraft, setTimeDraft] = useState({ start: '', end: '' })
+    const [attachmentInfo, setAttachmentInfo] = useState<UploadFileResult | null>(null)
 
     // 自动计算天数
     useEffect(() => {
@@ -150,6 +152,7 @@ export default function CreateLeave() {
                 startTime: dayjs(form.startTime).format('YYYY-MM-DD HH:mm:ss'),
                 endTime: dayjs(form.endTime).format('YYYY-MM-DD HH:mm:ss'),
                 approverId: Number(selectedApproverId),
+                attachment: form.attachment || undefined,
             }
             await applicationApi.createLeave(formattedForm)
             alert('提交成功')
@@ -267,6 +270,17 @@ export default function CreateLeave() {
                                 rows={4}
                             />
                         </div>
+
+                        <AttachmentUpload
+                            label="证明附件（选填）"
+                            description="支持图片或 PDF，单文件不超过 10MB"
+                            value={attachmentInfo}
+                            onChange={(file) => {
+                                setAttachmentInfo(file)
+                                setForm((prev) => ({ ...prev, attachment: file?.fileUrl || '' }))
+                            }}
+                            disabled={loading}
+                        />
 
                         <div className="flex gap-4 pt-4">
                             <Button

@@ -14,7 +14,8 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { useAuthStore } from '@/store/authStore'
-import type { ApproverOption } from '@/types'
+import type { ApproverOption, UploadFileResult } from '@/types'
+import { AttachmentUpload } from '@/components/AttachmentUpload'
 
 export default function CreateReimburse() {
     const navigate = useNavigate()
@@ -30,6 +31,7 @@ export default function CreateReimburse() {
     const [approvers, setApprovers] = useState<ApproverOption[]>([])
     const [selectedApproverId, setSelectedApproverId] = useState('')
     const [submitBlockReason, setSubmitBlockReason] = useState<string | null>(null)
+    const [invoiceInfo, setInvoiceInfo] = useState<UploadFileResult | null>(null)
 
     const expenseTypeOptions = [
         { label: '差旅交通费', value: '1' },
@@ -205,15 +207,16 @@ export default function CreateReimburse() {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <Label>发票附件链接 *</Label>
-                            <Input
-                                type="url"
-                                value={form.invoiceAttachment}
-                                onChange={(e) => setForm({ ...form, invoiceAttachment: e.target.value })}
-                                placeholder="请输入发票附件链接"
-                            />
-                        </div>
+                        <AttachmentUpload
+                            label="发票附件 *"
+                            description="请上传发票照片或 PDF，单文件不超过 10MB"
+                            value={invoiceInfo}
+                            onChange={(file) => {
+                                setInvoiceInfo(file)
+                                setForm((prev) => ({ ...prev, invoiceAttachment: file?.fileUrl || '' }))
+                            }}
+                            disabled={loading}
+                        />
 
                         
 

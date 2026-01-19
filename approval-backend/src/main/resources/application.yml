@@ -83,3 +83,6 @@ logging:
     com.baomidou.mybatisplus: debug
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
+
+file:
+  upload-path: ${FILE_UPLOAD_DIR:upload}

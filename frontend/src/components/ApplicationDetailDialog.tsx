@@ -13,6 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import {
     Table,
@@ -41,6 +42,7 @@ export function ApplicationDetailDialog({ appId, open, onOpenChange }: Applicati
     const [detail, setDetail] = useState<ApplicationDetailResponse | null>(null)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [previewFile, setPreviewFile] = useState<{ url: string; name?: string } | null>(null)
 
     useEffect(() => {
         if (!open || !appId) {
@@ -167,14 +169,15 @@ export function ApplicationDetailDialog({ appId, open, onOpenChange }: Applicati
                                             className="sm:col-span-2"
                                             label="附件"
                                             value={
-                                                <a
-                                                    href={leaveDetail.attachment}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-primary underline"
-                                                >
-                                                    查看附件
-                                                </a>
+                                                <AttachmentActions
+                                                    url={leaveDetail.attachment}
+                                                    onPreview={() =>
+                                                        setPreviewFile({
+                                                            url: resolveAttachmentUrl(leaveDetail.attachment!),
+                                                            name: leaveDetail.reason?.slice(0, 20) || '请假附件',
+                                                        })
+                                                    }
+                                                />
                                             }
                                         />
                                     )}
@@ -205,14 +208,15 @@ export function ApplicationDetailDialog({ appId, open, onOpenChange }: Applicati
                                             className="sm:col-span-2"   
                                             label="发票附件"
                                             value={
-                                                <a
-                                                    href={reimburseDetail.invoiceAttachment}
-                                                    target="_blank"
-                                                    rel="noreferrer"
-                                                    className="text-primary underline"
-                                                >
-                                                    查看附件
-                                                </a>
+                                                <AttachmentActions
+                                                    url={reimburseDetail.invoiceAttachment}
+                                                    onPreview={() =>
+                                                        setPreviewFile({
+                                                            url: resolveAttachmentUrl(reimburseDetail.invoiceAttachment!),
+                                                            name: '发票附件',
+                                                        })
+                                                    }
+                                                />
                                             }
                                         />
                                     )}
@@ -275,6 +279,7 @@ export function ApplicationDetailDialog({ appId, open, onOpenChange }: Applicati
                     </div>
                 )}
             </DialogContent>
+            <AttachmentPreviewDialog file={previewFile} onClose={() => setPreviewFile(null)} />
         </Dialog>
     )
 }
@@ -293,6 +298,74 @@ function TextPanel({ text, placeholder }: { text?: string; placeholder?: string 
         <div className="rounded-xl border border-[#d7dce5] bg-white px-3 py-2 text-sm text-muted-foreground shadow-[0_1px_2px_rgba(15,23,42,0.08)] min-h-[96px] whitespace-pre-line">
             {text?.trim() ? text : placeholder || '暂无说明'}
         </div>
+    )
+}
+
+function AttachmentActions({ url, onPreview }: { url: string; onPreview?: () => void }) {
+    const resolvedUrl = resolveAttachmentUrl(url)
+    if (!resolvedUrl) return null
+    const previewable = canPreviewInline(resolvedUrl)
+    return (
+        <div className="flex flex-wrap items-center gap-3">
+            <Button variant="outline" size="sm" asChild>
+                <a href={resolvedUrl} target="_blank" rel="noreferrer">
+                    新标签打开
+                </a>
+            </Button>
+            {previewable && onPreview && (
+                <Button type="button" variant="outline" size="sm" onClick={onPreview}>
+                    快速预览
+                </Button>
+            )}
+        </div>
+    )
+}
+
+function AttachmentPreviewDialog({
+    file,
+    onClose,
+}: {
+    file: { url: string; name?: string } | null
+    onClose: () => void
+}) {
+    const open = Boolean(file?.url)
+    const url = resolveAttachmentUrl(file?.url)
+
+    return (
+        <Dialog open={open} onOpenChange={(next) => {
+            if (!next) onClose()
+        }}>
+            <DialogContent className="max-w-4xl h-[85vh]">
+                <DialogHeader>
+                    <DialogTitle>{file?.name || extractFileName(url)}</DialogTitle>
+                    <DialogDescription>附件预览</DialogDescription>
+                </DialogHeader>
+                {url && (
+                    <div className="h-[70vh] w-full overflow-hidden rounded-xl border bg-muted">
+                        {isImageUrl(url) && (
+                            <img src={url} alt={file?.name || '附件'} className="mx-auto h-full w-full object-contain" />
+                        )}
+                        {isPdfUrl(url) && (
+                            <iframe
+                                src={url}
+                                title={file?.name || 'PDF 预览'}
+                                className="h-full w-full"
+                            />
+                        )}
+                        {!isImageUrl(url) && !isPdfUrl(url) && (
+                            <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-sm text-muted-foreground">
+                                <p>当前文件类型暂不支持内嵌预览，请在新标签页中打开。</p>
+                                <Button asChild>
+                                    <a href={url} target="_blank" rel="noreferrer">
+                                        在新标签打开
+                                    </a>
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
     )
 }
 
@@ -328,6 +401,69 @@ const formatCurrency = (value?: number | string) => {
         return `¥${parsed.toFixed(2)}`
     }
     return String(value)
+}
+
+function resolveAttachmentUrl(raw?: string) {
+    if (!raw) return ''
+    const trimmed = raw.trim()
+    if (!trimmed) return ''
+    if (/^https?:\/\//i.test(trimmed)) {
+        return trimmed
+    }
+
+    const appBase = (import.meta.env.VITE_APP_BASE_API || '/api').trim() || '/api'
+    const normalizedBase = /^https?:\/\//i.test(appBase)
+        ? appBase.replace(/\/$/, '')
+        : appBase.startsWith('/')
+            ? appBase.replace(/\/$/, '')
+            : `/${appBase}`.replace(/\/$/, '')
+
+    const sanitized = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+
+    if (sanitized.startsWith('/api/')) {
+        return sanitized
+    }
+
+    let path = sanitized
+    if (sanitized.startsWith('/upload/')) {
+        path = sanitized
+    } else if (sanitized.startsWith('/file/upload')) {
+        path = sanitized.replace('/file', '')
+    } else {
+        const withoutUploadPrefix = sanitized.replace(/^\/upload\//, '')
+        path = `/upload/${withoutUploadPrefix.replace(/^\//, '')}`
+    }
+
+    if (/^https?:\/\//i.test(normalizedBase)) {
+        return `${normalizedBase}${path}`
+    }
+
+    // normalizedBase 是诸如 /api 这样的相对路径
+    return `${normalizedBase}${path}`
+}
+
+const IMAGE_EXT = /(\.png|\.jpe?g|\.gif|\.bmp|\.webp|\.svg)$/i
+const PDF_EXT = /\.pdf$/i
+
+const isImageUrl = (url?: string) => {
+    if (!url) return false
+    const cleanUrl = url.split('?')[0]
+    return IMAGE_EXT.test(cleanUrl)
+}
+
+const isPdfUrl = (url?: string) => {
+    if (!url) return false
+    const cleanUrl = url.split('?')[0]
+    return PDF_EXT.test(cleanUrl)
+}
+
+const canPreviewInline = (url?: string) => isImageUrl(url) || isPdfUrl(url)
+
+const extractFileName = (url?: string) => {
+    if (!url) return '附件'
+    const cleanUrl = url.split('?')[0]
+    const parts = cleanUrl.split('/')
+    return parts[parts.length - 1] || '附件'
 }
 
 const getDisplayTitle = (

@@ -184,6 +184,16 @@ export interface CreateReimburseRequest {
     approverId: number
 }
 
+export interface UploadFileResult {
+    fileName: string
+    filePath: string
+    fileUrl: string
+    fileSize: number
+    contentType?: string
+    businessType?: string
+    businessId?: number
+}
+
 export interface Task {
     taskId: number
     appId: number
@@ -196,6 +206,8 @@ export interface Task {
     action?: number
     comment?: string
     finishTime?: string
+    leaveType?: number
+    expenseType?: number
 }
 
 export interface ApproveTaskRequest {
