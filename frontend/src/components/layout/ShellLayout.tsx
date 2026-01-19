@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { ReactNode } from "react"
+import logoImage from "@/public/logo.png"
 
 export interface ShellNavItem {
     label: string
@@ -39,10 +40,10 @@ export function ShellLayout({
     return (
         <div className="relative min-h-screen w-full bg-transparent text-foreground">
             <div className="mx-auto flex min-h-screen max-w-[1600px] rounded-[48px] bg-white/70 shadow-[0_55px_120px_rgba(15,23,42,0.18)] backdrop-blur-2xl">
-                <aside className="hidden w-[260px] flex-col justify-between border-r border-white/30 bg-gradient-to-b from-[#101828] to-[#1f2937] p-6 text-white lg:flex">
+                <aside className="hidden w-[260px] flex-shrink-0 flex-col justify-between border-r border-white/30 bg-gradient-to-b from-[#101828] to-[#1f2937] p-6 text-white lg:flex">
                     <div className="space-y-4">
                         <div className="flex items-center gap-3 text-white/90">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-xl font-semibold">YH</div>
+                            <img className="h-12 w-12 rounded-full object-cover" src={logoImage} alt="Approval Hub Logo" />
                             <div>
                                 <p className="text-sm uppercase tracking-[0.2em] text-white/60">Approval Hub</p>
                                 <p className="text-lg font-semibold">审批系统</p>
