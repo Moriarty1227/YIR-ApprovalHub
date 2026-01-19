@@ -6,8 +6,12 @@ import com.approval.module.auth.dto.LoginDto;
 import com.approval.module.auth.dto.RegisterDto;
 import com.approval.module.auth.service.IAuthService;
 import com.approval.module.auth.vo.LoginVo;
+import com.approval.module.system.entity.Dept;
+import com.approval.module.system.entity.Post;
 import com.approval.module.system.entity.User;
-import com.approval.module.system.mapper.RoleMapper;
+import com.approval.module.system.mapper.PermissionMapper;
+import com.approval.module.system.mapper.PostMapper;
+import com.approval.module.system.mapper.DeptMapper;
 import com.approval.module.system.mapper.UserMapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +30,9 @@ import java.util.List;
 public class AuthServiceImpl implements IAuthService {
 
     private final UserMapper userMapper;
-    private final RoleMapper roleMapper;
+    private final PostMapper postMapper;
+    private final DeptMapper deptMapper;
+    private final PermissionMapper permissionMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtils jwtUtils;
 
@@ -53,6 +59,8 @@ public class AuthServiceImpl implements IAuthService {
         user.setRealName(dto.getRealName());
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
+        user.setDeptId(null);
+        user.setPostId(null);
         user.setStatus(1); // 默认启用
 
         userMapper.insert(user);
@@ -120,15 +128,30 @@ public class AuthServiceImpl implements IAuthService {
         userInfo.setUsername(user.getUsername());
         userInfo.setRealName(user.getRealName());
         userInfo.setAvatar(user.getAvatar());
-        
-        // 查询用户角色
-        List<String> roles = roleMapper.selectRoleKeysByUserId(user.getUserId());
-        if (roles == null || roles.isEmpty()) {
-            // 如果没有角色，默认给普通用户角色
-            userInfo.setRoles(Collections.singletonList("ROLE_USER"));
-        } else {
-            userInfo.setRoles(roles);
+
+        if (user.getDeptId() != null) {
+            Dept dept = deptMapper.selectById(user.getDeptId());
+            if (dept != null) {
+                userInfo.setDeptId(dept.getDeptId());
+                userInfo.setDeptName(dept.getDeptName());
+            }
         }
+        
+        if (user.getPostId() != null) {
+            Post post = postMapper.selectById(user.getPostId());
+            if (post != null) {
+                userInfo.setPostId(post.getPostId());
+                userInfo.setPostName(post.getPostName());
+            }
+        }
+
+        List<String> permissions = user.getPostId() != null
+                ? permissionMapper.selectPermissionCodesByPostId(user.getPostId())
+                : Collections.emptyList();
+        if (permissions == null || permissions.isEmpty()) {
+            permissions = Collections.singletonList("BASIC_APPLICANT");
+        }
+        userInfo.setPermissions(permissions);
         
         return userInfo;
     }

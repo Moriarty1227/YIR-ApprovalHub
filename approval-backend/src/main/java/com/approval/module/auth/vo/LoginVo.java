@@ -20,6 +20,10 @@ public class LoginVo {
         private String username;
         private String realName;
         private String avatar;
-        private List<String> roles;
+        private Long deptId;
+        private String deptName;
+        private Long postId;
+        private String postName;
+        private List<String> permissions;
     }
 }

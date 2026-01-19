@@ -47,8 +47,10 @@ public class SecurityConfig {
                         .requestMatchers("/doc.html", "/webjars/**", "/v3/api-docs/**").permitAll()
                         // 静态资源
                         .requestMatchers("/static/**", "/upload/**").permitAll()
-                        // 其他请求需要认证
-                        .anyRequest().authenticated());
+                // 其他请求需要认证
+                .anyRequest().authenticated())
+            // 允许同源 iframe 预览上传附件
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
 
         return http.build();
     }

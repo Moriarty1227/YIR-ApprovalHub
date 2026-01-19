@@ -1,12 +1,12 @@
-import axios from 'axios'
+import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios'
 
-const request = axios.create({
+const axiosInstance: AxiosInstance = axios.create({
     baseURL: import.meta.env.VITE_APP_BASE_API || '/api',
     timeout: 10000,
 })
 
 // 请求拦截器
-request.interceptors.request.use(
+axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token')
         if (token) {
@@ -20,7 +20,7 @@ request.interceptors.request.use(
 )
 
 // 响应拦截器
-request.interceptors.response.use(
+axiosInstance.interceptors.response.use(
     (response) => {
         const { code, data, message } = response.data
 
@@ -47,5 +47,27 @@ request.interceptors.response.use(
         return Promise.reject(error)
     }
 )
+
+type HttpClient = {
+    get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+    post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>
+    delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>
+}
+
+const request: HttpClient = {
+    get(url, config) {
+        return axiosInstance.get(url, config)
+    },
+    post(url, data, config) {
+        return axiosInstance.post(url, data, config)
+    },
+    put(url, data, config) {
+        return axiosInstance.put(url, data, config)
+    },
+    delete(url, config) {
+        return axiosInstance.delete(url, config)
+    },
+}
 
 export default request

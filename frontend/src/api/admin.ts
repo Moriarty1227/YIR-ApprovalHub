@@ -3,12 +3,14 @@ import type {
     AdminUser,
     AdminDept,
     AdminPost,
-    AdminRole,
+    Permission,
     UserFormData,
     DeptFormData,
     PostFormData,
-    AssignRolesData,
+    AssignPostData,
     Application,
+    ReportSummary,
+    ReportDeptDetail,
 } from '@/types'
 
 export const adminApi = {
@@ -20,7 +22,7 @@ export const adminApi = {
         deptId?: number
         status?: number
     }) =>
-        request.get<any, { records: AdminUser[]; total: number }>('/admin/users', { params }),
+        request.get<{ records: AdminUser[]; total: number }>('/admin/users', { params }),
 
     getUserById: (userId: number) =>
         request.get<AdminUser>(`/admin/users/${userId}`),
@@ -40,7 +42,7 @@ export const adminApi = {
         deptName?: string
         status?: number
     }) =>
-        request.get<any, { records: AdminDept[]; total: number }>('/admin/depts', { params }),
+        request.get<{ records: AdminDept[]; total: number }>('/admin/depts', { params }),
 
     getDeptById: (deptId: number) =>
         request.get<AdminDept>(`/admin/depts/${deptId}`),
@@ -60,7 +62,7 @@ export const adminApi = {
         postName?: string
         status?: number
     }) =>
-        request.get<any, { records: AdminPost[]; total: number }>('/admin/posts', { params }),
+        request.get<{ records: AdminPost[]; total: number }>('/admin/posts', { params }),
 
     getPostById: (postId: number) =>
         request.get<AdminPost>(`/admin/posts/${postId}`),
@@ -74,8 +76,8 @@ export const adminApi = {
     deletePost: (postId: number) =>
         request.delete(`/admin/posts/${postId}`),
 
-    assignRoles: (data: AssignRolesData) =>
-        request.post('/admin/users/roles', data),
+    assignPost: (data: AssignPostData) =>
+        request.post('/admin/users/post', data),
 
     getAllDepts: () =>
         request.get<AdminDept[]>('/admin/depts/all'),
@@ -83,8 +85,14 @@ export const adminApi = {
     getAllPosts: () =>
         request.get<AdminPost[]>('/admin/posts/all'),
 
-    getAllRoles: () =>
-        request.get<AdminRole[]>('/admin/roles/all'),
+    getAllPermissions: () =>
+        request.get<Permission[]>('/admin/permissions/all'),
+
+    getReportSummary: (params?: { month?: string }) =>
+        request.get<ReportSummary>('/admin/reports/summary', { params }),
+
+    getDeptReportDetail: (params: { deptId: number; month?: string }) =>
+        request.get<ReportDeptDetail>('/admin/reports/dept-detail', { params }),
 
     getAllApplications: (params: {
         pageNum?: number
@@ -93,7 +101,7 @@ export const adminApi = {
         status?: number
         appNo?: string
     }) =>
-        request.get<any, { records: Application[]; total: number }>('/admin/applications', { params }),
+        request.get<{ records: Application[]; total: number }>('/admin/applications', { params }),
 
     getApplicationDetail: (appId: number) =>
         request.get(`/admin/applications/${appId}`),

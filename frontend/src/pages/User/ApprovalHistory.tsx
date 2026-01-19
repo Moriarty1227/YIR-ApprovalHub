@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Eye } from 'lucide-react'
 import {
     Select,
     SelectContent,
@@ -13,21 +14,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-
-
-const statusMap: Record<number, { text: string; variant: "default" | "secondary" | "destructive" | "outline" | "success" | "warning" }> = {
-    0: { text: '草稿', variant: 'secondary' },
-    1: { text: '待审批', variant: 'warning' },
-    2: { text: '审批中', variant: 'default' },
-    3: { text: '已通过', variant: 'success' },
-    4: { text: '已拒绝', variant: 'destructive' },
-    5: { text: '已撤回', variant: 'outline' },
-}
-
-const typeMap: Record<string, string> = {
-    leave: '请假',
-    reimburse: '报销',
-}
+import { ApplicationDetailDialog } from '@/components/ApplicationDetailDialog'
+import PaginationControls from '@/components/PaginationControls'
+import {
+    APPLICATION_STATUS,
+    APPLICATION_TYPE_LABELS,
+    LEAVE_TYPE_LABELS,
+    EXPENSE_TYPE_LABELS,
+} from '@/constants/application'
 
 const getMonthRange = (month: string) => {
     const start = dayjs(month, 'YYYY-MM').startOf('month')
@@ -44,6 +38,11 @@ export default function ApprovalHistory() {
     const [approverOptions, setApproverOptions] = useState<string[]>([])
     const [monthOptions, setMonthOptions] = useState<string[]>([])
     const [filter, setFilter] = useState({ appType: '', status: '', approverName: '', month: '' })
+    const [detailAppId, setDetailAppId] = useState<number | undefined>()
+    const [detailOpen, setDetailOpen] = useState(false)
+    const [pageNum, setPageNum] = useState(1)
+    const [total, setTotal] = useState(0)
+    const pageSize = 10
 
     const loadFilterOptions = async () => {
         try {
@@ -74,8 +73,8 @@ export default function ApprovalHistory() {
         setLoading(true)
         try {
             const params: Record<string, any> = {
-                pageNum: 1,
-                pageSize: 20,
+                pageNum,
+                pageSize,
                 appType: filter.appType || undefined,
                 status: filter.status ? Number(filter.status) : undefined,
                 approverName: filter.approverName || undefined,
@@ -89,7 +88,12 @@ export default function ApprovalHistory() {
 
             const res = await applicationApi.getHistoryApplications(params)
             const records = Array.isArray(res.records) ? res.records : []
+            if (pageNum > 1 && records.length === 0 && (res.total || 0) > 0) {
+                setPageNum((prev) => Math.max(1, prev - 1))
+                return
+            }
             setApplications(records)
+            setTotal(res.total || records.length)
         } catch (error) {
             console.error(error)
         } finally {
@@ -104,7 +108,12 @@ export default function ApprovalHistory() {
     useEffect(() => {
         fetchApplications()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter.appType, filter.status, filter.approverName, filter.month])
+    }, [filter.appType, filter.status, filter.approverName, filter.month, pageNum])
+
+    const handleViewDetail = (appId: number) => {
+        setDetailAppId(appId)
+        setDetailOpen(true)
+    }
 
     const renderDateTime = (value?: string) => (value ? new Date(value).toLocaleString('zh-CN') : '-')
 
@@ -125,9 +134,10 @@ export default function ApprovalHistory() {
                     <div className="flex gap-4">
                         <Select
                             value={filter.appType}
-                            onValueChange={(val) =>
+                            onValueChange={(val) => {
                                 setFilter((prev) => ({ ...prev, appType: val === 'all' ? '' : val }))
-                            }
+                                setPageNum(1)
+                            }}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="全部类型" />
@@ -141,9 +151,10 @@ export default function ApprovalHistory() {
 
                         <Select
                             value={filter.status}
-                            onValueChange={(val) =>
+                            onValueChange={(val) => {
                                 setFilter((prev) => ({ ...prev, status: val === 'all' ? '' : val }))
-                            }
+                                setPageNum(1)
+                            }}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="全部状态" />
@@ -158,9 +169,10 @@ export default function ApprovalHistory() {
 
                         <Select
                             value={filter.approverName}
-                            onValueChange={(val) =>
+                            onValueChange={(val) => {
                                 setFilter((prev) => ({ ...prev, approverName: val === 'all' ? '' : val }))
-                            }
+                                setPageNum(1)
+                            }}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="审批人" />
@@ -183,9 +195,10 @@ export default function ApprovalHistory() {
 
                         <Select
                             value={filter.month}
-                            onValueChange={(val) =>
+                            onValueChange={(val) => {
                                 setFilter((prev) => ({ ...prev, month: val === 'all' ? '' : val }))
-                            }
+                                setPageNum(1)
+                            }}
                         >
                             <SelectTrigger className="w-[180px]">
                                 <SelectValue placeholder="时间" />
@@ -231,17 +244,25 @@ export default function ApprovalHistory() {
                                 {applications.map((app) => (
                                     <TableRow key={app.appId}>
                                         <TableCell>{app.appNo}</TableCell>
-                                        <TableCell>{typeMap[app.appType]}</TableCell>
-                                        <TableCell>{app.title}</TableCell>
+                                        <TableCell>{APPLICATION_TYPE_LABELS[app.appType] || app.appType}</TableCell>
+                                        <TableCell>{renderTitle(app)}</TableCell>
                                         <TableCell>{app.approverName || '-'}</TableCell>
                                         <TableCell>
-                                            <Badge variant={statusMap[app.status]?.variant}>
-                                                {statusMap[app.status]?.text}
+                                            <Badge variant={APPLICATION_STATUS[app.status]?.variant || 'outline'}>
+                                                {APPLICATION_STATUS[app.status]?.text || '-'}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>{renderDateTime(app.submitTime)}</TableCell>
                                         <TableCell className="space-x-2">
-                                            <Button variant="link" size="sm">查看</Button>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                className="inline-flex items-center gap-1 rounded-full border-primary/30 px-4 py-1 text-primary hover:border-primary/60 hover:bg-primary/5"
+                                                onClick={() => handleViewDetail(app.appId)}
+                                            >
+                                                <Eye className="h-4 w-4" />
+                                                查看
+                                            </Button>
                                            
                                         </TableCell>
                                     </TableRow>
@@ -249,8 +270,45 @@ export default function ApprovalHistory() {
                             </TableBody>
                         </Table>
                     )}
+                    {!loading && total > pageSize && (
+                        <PaginationControls
+                            pageNum={pageNum}
+                            pageSize={pageSize}
+                            total={total}
+                            onPageChange={setPageNum}
+                        />
+                    )}
                 </CardContent>
             </Card>
+
+            <ApplicationDetailDialog
+                appId={detailAppId}
+                open={detailOpen}
+                onOpenChange={(open) => {
+                    setDetailOpen(open)
+                    if (!open) {
+                        setDetailAppId(undefined)
+                    }
+                }}
+            />
         </div>
     )
+}
+
+const renderTitle = (app: ApplicationHistory) => {
+    if (app.appType === 'leave') {
+        if (app.leaveType) {
+            return LEAVE_TYPE_LABELS[app.leaveType] 
+        }
+        
+    }
+
+    if (app.appType === 'reimburse') {
+        if (app.expenseType) {
+            return EXPENSE_TYPE_LABELS[app.expenseType] 
+        }
+        
+    }
+
+    return app.title || '-'
 }

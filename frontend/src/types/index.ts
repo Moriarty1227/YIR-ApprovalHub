@@ -3,7 +3,11 @@ export interface User {
     username: string
     realName: string
     avatar?: string
-    roles: string[]
+    deptId?: number
+    deptName?: string
+    postId?: number
+    postName?: string
+    permissions: string[]
 }
 
 export interface LoginRequest {
@@ -36,6 +40,23 @@ export interface Application {
     currentNode: string
     submitTime: string
     finishTime?: string
+    leaveType?: number
+    expenseType?: number
+}
+
+export interface ApplicationEntity {
+    appId: number
+    appNo: string
+    appType: string
+    title: string
+    applicantId: number
+    deptId?: number
+    status: number
+    currentNode?: string
+    submitTime?: string
+    finishTime?: string
+    createTime?: string
+    updateTime?: string
 }
 
 export interface ApplicationHistory {
@@ -59,6 +80,42 @@ export interface ApplicationHistory {
     finishTime?: string
 }
 
+export interface LeaveApplicationDetail {
+    leaveId: number
+    appId: number
+    leaveType: number
+    startTime?: string
+    endTime?: string
+    days?: number
+    reason?: string
+    attachment?: string
+}
+
+export interface ReimburseApplicationDetail {
+    reimburseId: number
+    appId: number
+    expenseType: number
+    amount?: number
+    reason?: string
+    invoiceAttachment?: string
+    occurDate?: string
+}
+
+export interface ApprovalHistoryRecord {
+    historyId: number
+    nodeName?: string
+    approverName?: string
+    action?: number
+    comment?: string
+    approveTime?: string
+}
+
+export interface ApplicationDetailResponse {
+    application: ApplicationEntity
+    detail?: LeaveApplicationDetail | ReimburseApplicationDetail
+    history: ApprovalHistoryRecord[]
+}
+
 export interface ApplicationSummary {
     userId: number
     realName: string
@@ -77,6 +134,37 @@ export interface ApplicationSummary {
     lastSubmitTime?: string
 }
 
+export interface ApprovalTypeStat {
+    appType: string
+    typeLabel: string
+    count: number
+}
+
+export interface DailyApprovalStat {
+    date: string
+    count: number
+}
+
+export interface ApproverDashboardSummary {
+    realName: string
+    deptName?: string
+    postName?: string
+    totalCount: number
+    approvedCount: number
+    rejectedCount: number
+    typeStats: ApprovalTypeStat[]
+    dailyStats: DailyApprovalStat[]
+}
+
+export interface ApproverOption {
+    userId: number
+    realName: string
+    deptId: number
+    deptName?: string
+    postId?: number
+    postName?: string
+}
+
 export interface CreateLeaveRequest {
     leaveType: number
     startTime: string
@@ -84,6 +172,7 @@ export interface CreateLeaveRequest {
     days: number
     reason: string
     attachment?: string
+    approverId: number
 }
 
 export interface CreateReimburseRequest {
@@ -92,6 +181,17 @@ export interface CreateReimburseRequest {
     reason: string
     invoiceAttachment: string
     occurDate: string
+    approverId: number
+}
+
+export interface UploadFileResult {
+    fileName: string
+    filePath: string
+    fileUrl: string
+    fileSize: number
+    contentType?: string
+    businessType?: string
+    businessId?: number
 }
 
 export interface Task {
@@ -106,6 +206,8 @@ export interface Task {
     action?: number
     comment?: string
     finishTime?: string
+    leaveType?: number
+    expenseType?: number
 }
 
 export interface ApproveTaskRequest {
@@ -126,7 +228,7 @@ export interface AdminUser {
     postName?: string
     avatar?: string
     status: number
-    roles: string[]
+    permissions: string[]
     createTime: string
 }
 
@@ -150,15 +252,14 @@ export interface AdminPost {
     postSort: number
     status: number
     createTime: string
+    permissions?: Permission[]
 }
 
-export interface AdminRole {
-    roleId: number
-    roleName: string
-    roleKey: string
-    roleSort: number
-    status: number
-    remark?: string
+export interface Permission {
+    permissionId: number
+    permissionCode: string
+    permissionName: string
+    description?: string
 }
 
 export interface UserFormData {
@@ -191,9 +292,79 @@ export interface PostFormData {
     postName: string
     postSort: number
     status: number
+    permissionIds?: number[]
 }
 
-export interface AssignRolesData {
+export interface AssignPostData {
     userId: number
-    roleIds: number[]
+    postId: number
+    deptId?: number
+}
+
+export interface ReportDeptEmployeeStat {
+    deptId: number
+    deptName: string
+    userCount: number
+}
+
+export interface ReportPostEmployeeStat {
+    postId: number
+    postName: string
+    userCount: number
+}
+
+export interface ReportApplicationTypeStat {
+    total: number
+    approved: number
+    approvalRate: number
+}
+
+export interface ReportApplicationStats {
+    leave: ReportApplicationTypeStat
+    reimburse: ReportApplicationTypeStat
+}
+
+export interface ReportDeptMonthlyStat {
+    deptId: number
+    deptName: string
+    leaveTotal: number
+    reimburseTotal: number
+    approvalRate: number
+}
+
+export interface ReportSummary {
+    month: string
+    deptEmployeeStats: ReportDeptEmployeeStat[]
+    postEmployeeStats: ReportPostEmployeeStat[]
+    applicationStats: ReportApplicationStats
+    deptMonthlyStats: ReportDeptMonthlyStat[]
+}
+
+export interface ReportMemberLeaveDetail {
+    userId: number
+    realName: string
+    times: number
+    days: number
+}
+
+export interface ReportMemberReimburseDetail {
+    userId: number
+    realName: string
+    times: number
+    amount: number
+}
+
+export interface ReportDeptPostStat {
+    postId: number | null
+    postName: string
+    userCount: number
+}
+
+export interface ReportDeptDetail {
+    deptId: number
+    deptName: string
+    month: string
+    deptPostStats: ReportDeptPostStat[]
+    leaveDetails: ReportMemberLeaveDetail[]
+    reimburseDetails: ReportMemberReimburseDetail[]
 }
