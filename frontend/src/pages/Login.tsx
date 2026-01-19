@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/authStore'
@@ -15,6 +15,11 @@ export default function Login() {
         username: '',
         password: '',
     })
+
+    useEffect(() => {
+        document.body.classList.add('login-shell')
+        return () => document.body.classList.remove('login-shell')
+    }, [])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -36,7 +41,7 @@ export default function Login() {
         }
     }
 
-    return (
+        return (
             <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
                 {/* 登录卡片 */}
             <Card className="w-full max-w-md shadow-lg bg-white/30 backdrop-blur-md border border-white/20">
@@ -83,7 +88,7 @@ export default function Login() {
                         </Link>
                     </div>
 
-                    <div className="flex flex-col gap-2 text-xs text-muted-foreground border-t pt-4 w-full">
+                    <div className="flex text-white flex-col gap-2 border-t pt-4 w-full">
                         {[
                             { label: '管理账号', account: 'admin / 123456', icon: '👩‍💼' },
                             { label: '审批账号', account: 'zyb / 123456', icon: '✅' },
@@ -91,11 +96,11 @@ export default function Login() {
                         ].map((item) => (
                             <span
                                 key={item.label}
-                                className="flex items-center gap-3 rounded-full border border-muted-foreground/20 px-4 py-2 text-sm"
+                                className="flex items-center ap-3 rounded-full border border-muted-foreground/20 px-4 py-2 text-sm"
                             >
-                                <span className="text-base w-6 text-center">{item.icon}</span>
-                                <span className="font-medium text-foreground w-20 text-left">{item.label}</span>
-                                <span className="text-muted-foreground flex-1 text-left">{item.account}</span>
+                                <span className=" text-base w-6 text-center">{item.icon}</span>
+                                <span className="font-medium text-white w-20 text-left">{item.label}</span>
+                                <span className="text-white flex-1 text-left">{item.account}</span>
                             </span>
                         ))}
 

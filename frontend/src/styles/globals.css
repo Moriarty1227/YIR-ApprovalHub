@@ -54,10 +54,14 @@
     font-family: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "PingFang SC",
       "Hiragino Sans GB", sans-serif;
     @apply text-foreground antialiased;
+    background-color: hsl(var(--background));
+    letter-spacing: -0.01em;
+  }
+
+  body.login-shell {
     background-image: var(--shell-gradient);
     background-attachment: fixed;
     min-height: 100vh;
-    letter-spacing: -0.01em;
   }
 
   h1,
