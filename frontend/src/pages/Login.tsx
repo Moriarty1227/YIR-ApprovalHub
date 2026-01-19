@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { authApi } from '@/api'
 import { useAuthStore } from '@/store/authStore'
@@ -15,19 +15,6 @@ export default function Login() {
         username: '',
         password: '',
     })
-
-    useEffect(() => {
-        // 加载樱花效果脚本
-        const script = document.createElement('script')
-        script.src = '/sakura.js'
-        script.async = true
-        document.body.appendChild(script)
-        
-        return () => {
-            // 清理脚本
-            document.body.removeChild(script)
-        }
-    }, [])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -50,11 +37,8 @@ export default function Login() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-            {/* 樱花Canvas */}
-            <canvas id="sakura" className="absolute top-0 left-0 w-full h-full -z-10"></canvas>
-            
-            {/* 登录卡片 */}
+            <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+                {/* 登录卡片 */}
             <Card className="w-full max-w-md shadow-lg bg-white/30 backdrop-blur-md border border-white/20">
                 <CardHeader className="space-y-1 text-center">
                     <CardTitle className="text-2xl font-bold text-white text-shadow-md">审批系统</CardTitle>

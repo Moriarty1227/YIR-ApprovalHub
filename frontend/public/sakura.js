@@ -200,15 +200,15 @@ function createShader(vtxsrc, frgsrc, uniformlist, attrlist) {
     
     if(uniformlist) {
         prog.uniforms = {};
-        for(var i = 0; i < uniformlist.length; i++) {
+        for(let i = 0; i < uniformlist.length; i++) {
             prog.uniforms[uniformlist[i]] = gl.getUniformLocation(prog, uniformlist[i]);
         }
     }
     
     if(attrlist) {
         prog.attributes = {};
-        for(var i = 0; i < attrlist.length; i++) {
-            var attr = attrlist[i];
+        for(let j = 0; j < attrlist.length; j++) {
+            let attr = attrlist[j];
             prog.attributes[attr] = gl.getAttribLocation(prog, attr);
         }
     }
@@ -219,13 +219,13 @@ function createShader(vtxsrc, frgsrc, uniformlist, attrlist) {
 function useShader(prog) {
     gl.useProgram(prog);
     for(var attr in prog.attributes) {
-        gl.enableVertexAttribArray(prog.attributes[attr]);;
+        gl.enableVertexAttribArray(prog.attributes[attr]);
     }
 }
 
 function unuseShader(prog) {
     for(var attr in prog.attributes) {
-        gl.disableVertexAttribArray(prog.attributes[attr]);;
+        gl.disableVertexAttribArray(prog.attributes[attr]);
     }
     gl.useProgram(null);
 }
@@ -286,7 +286,7 @@ BlossomParticle.prototype.setSize = function (s) {
     this.size = s;
 };
 
-BlossomParticle.prototype.update = function (dt, et) {
+BlossomParticle.prototype.update = function (dt) {
     this.position[0] += this.velocity[0] * dt;
     this.position[1] += this.velocity[1] * dt;
     this.position[2] += this.velocity[2] * dt;
@@ -315,7 +315,7 @@ function createPointFlowers() {
     pointFlower.fader = Vector3.create(0.0, 10.0, 0.0);
     
     // paramerters: velocity[3], rotate[3]
-    pointFlower.numFlowers = 1600;
+    pointFlower.numFlowers = 800;
     pointFlower.particles = new Array(pointFlower.numFlowers);
     // vertex attributes {position[3], euler_xyz[3], size[1]}
     pointFlower.dataArray = new Float32Array(pointFlower.numFlowers * (3 + 3 + 2));
@@ -330,7 +330,7 @@ function createPointFlowers() {
     
     unuseShader(pointFlower.program);
     
-    for(var i = 0; i < pointFlower.numFlowers; i++) {
+    for(let i = 0; i < pointFlower.numFlowers; i++) {
         pointFlower.particles[i] = new BlossomParticle();
     }
 }
@@ -349,15 +349,15 @@ function initPointFlowers() {
     var tmpv3 = Vector3.create(0, 0, 0);
     var tmpv = 0;
     var symmetryrand = function() {return (Math.random() * 2.0 - 1.0);};
-    for(var i = 0; i < pointFlower.numFlowers; i++) {
-        var tmpprtcl = pointFlower.particles[i];
+    for(let i = 0; i < pointFlower.numFlowers; i++) {
+        let tmpprtcl = pointFlower.particles[i];
         
         //velocity
         tmpv3.x = symmetryrand() * 0.3 + 0.8;
         tmpv3.y = symmetryrand() * 0.2 - 1.0;
         tmpv3.z = symmetryrand() * 0.3 + 0.5;
         Vector3.normalize(tmpv3);
-        tmpv = 2.0 + Math.random() * 1.0;
+        tmpv = 2.0 + Math.random();
         tmpprtcl.setVelocity(tmpv3.x * tmpv, tmpv3.y * tmpv, tmpv3.z * tmpv);
         
         //rotation
@@ -389,7 +389,6 @@ function initPointFlowers() {
 function renderPointFlowers() {
     //update
     var PI2 = Math.PI * 2.0;
-    var limit = [pointFlower.area.x, pointFlower.area.y, pointFlower.area.z];
     var repeatPos = function (prt, cmp, limit) {
         if(Math.abs(prt.position[cmp]) - prt.size * 0.5 > limit) {
             //out of area
@@ -408,9 +407,9 @@ function renderPointFlowers() {
         }
     };
     
-    for(var i = 0; i < pointFlower.numFlowers; i++) {
-        var prtcl = pointFlower.particles[i];
-        prtcl.update(timeInfo.delta, timeInfo.elapsed);
+    for(let i = 0; i < pointFlower.numFlowers; i++) {
+        let prtcl = pointFlower.particles[i];
+        prtcl.update(timeInfo.delta);
         repeatPos(prtcl, 0, pointFlower.area.x);
         repeatPos(prtcl, 1, pointFlower.area.y);
         repeatPos(prtcl, 2, pointFlower.area.z);
@@ -433,8 +432,8 @@ function renderPointFlowers() {
     var ipos = pointFlower.positionArrayOffset;
     var ieuler = pointFlower.eulerArrayOffset;
     var imisc = pointFlower.miscArrayOffset;
-    for(var i = 0; i < pointFlower.numFlowers; i++) {
-        var prtcl = pointFlower.particles[i];
+    for(let i = 0; i < pointFlower.numFlowers; i++) {
+        let prtcl = pointFlower.particles[i];
         pointFlower.dataArray[ipos] = prtcl.position[0];
         pointFlower.dataArray[ipos + 1] = prtcl.position[1];
         pointFlower.dataArray[ipos + 2] = prtcl.position[2];
@@ -470,8 +469,8 @@ function renderPointFlowers() {
     gl.vertexAttribPointer(prog.attributes.aMisc, 2, gl.FLOAT, false, 0, pointFlower.miscArrayOffset * Float32Array.BYTES_PER_ELEMENT);
     
     // doubler
-    for(var i = 1; i < 2; i++) {
-        var zpos = i * -2.0;
+    for(let j = 1; j < 2; j++) {
+        let zpos = j * -2.0;
         pointFlower.offset[0] = pointFlower.area.x * -1.0;
         pointFlower.offset[1] = pointFlower.area.y * -1.0;
         pointFlower.offset[2] = pointFlower.area.z * zpos;
@@ -642,9 +641,9 @@ function renderPostProcess() {
     unuseEffect(effectLib.mkBrightBuf);
     
     // make bloom
-    for(var i = 0; i < 2; i++) {
-        var p = 1.5 + 1 * i;
-        var s = 2.0 + 1 * i;
+    for(let i = 0; i < 2; i++) {
+        let p = 1.5 + i;
+        let s = 2.0 + i;
         bindRT(renderSpec.wHalfRT1, true);
         useEffect(effectLib.dirBlur, renderSpec.wHalfRT0);
         gl.uniform4f(effectLib.dirBlur.program.uniforms.uBlurDir, p, 0.0, s, 0.0);
@@ -711,7 +710,7 @@ function renderScene() {
     renderPostProcess();
 }
 
-function onResize(e) {
+function onResize() {
     makeCanvasFullScreen(document.getElementById("sakura"));
     setViewports();
     if(sceneStandBy) {
@@ -767,27 +766,38 @@ function makeCanvasFullScreen(canvas) {
 	canvas.height = fullh;
 }
 
-window.addEventListener('load', function(e) {
-    var canvas = document.getElementById("sakura");
-    try {
-        makeCanvasFullScreen(canvas);
-        gl = canvas.getContext('experimental-webgl');
-    } catch(e) {
-        alert("WebGL not supported." + e);
-        console.error(e);
-        return;
-    }
-    
-    window.addEventListener('resize', onResize);
-    
-    setViewports();
-    createScene();
-    initScene();
-    
-    timeInfo.start = new Date();
-    timeInfo.prev = timeInfo.start;
-    animate();
-});
+// 确保sakura.js只初始化一次
+if (!window.sakuraInitialized) {
+    window.addEventListener('load', function() {
+        var canvas = document.getElementById("sakura");
+        try {
+            makeCanvasFullScreen(canvas);
+            gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) {
+                alert("WebGL not supported.");
+                console.error("WebGL not supported");
+                return;
+            }
+        } catch(e) {
+            alert("WebGL not supported." + e);
+            console.error(e);
+            return;
+        }
+        
+        window.addEventListener('resize', onResize);
+        
+        setViewports();
+        createScene();
+        initScene();
+        
+        timeInfo.start = new Date();
+        timeInfo.prev = timeInfo.start;
+        animate();
+        
+        // 标记为已初始化
+        window.sakuraInitialized = true;
+    });
+}
 
 //set window.requestAnimationFrame
 (function (w, r) {
