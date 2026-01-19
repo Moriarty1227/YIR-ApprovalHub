@@ -5,8 +5,9 @@ import DeptManagement from './DeptManagement'
 import PostManagement from './PostManagement'
 import PostAssignment from './PostAssignment'
 import AllApplications from './AllApplications'
+import ReportCenter from './ReportCenter'
 import { Button } from '@/components/ui/button'
-import { LogOut, Users, Building2, Briefcase, Shield, Database } from 'lucide-react'
+import { LogOut, Users, Building2, Briefcase, Shield, Database, BarChart3 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 /**
@@ -29,6 +30,7 @@ export default function AdminDashboard() {
         { href: '/dashboard/posts', label: '岗位管理', icon: Briefcase },
         { href: '/dashboard/roles', label: '岗位分配', icon: Shield },
         { href: '/dashboard/all-applications', label: '审批数据', icon: Database },
+        { href: '/dashboard/reports', label: '统计报表', icon: BarChart3 },
     ]
 
     return (
@@ -85,6 +87,7 @@ export default function AdminDashboard() {
                             <Route path="posts" element={<PostManagement />} />
                             <Route path="roles" element={<PostAssignment />} />
                             <Route path="all-applications" element={<AllApplications />} />
+                            <Route path="reports" element={<ReportCenter />} />
                             <Route
                                 path="/"
                                 element={
@@ -102,8 +105,8 @@ export default function AdminDashboard() {
                                             <Button variant="outline" onClick={() => navigate('/dashboard/depts')}>
                                                 部门管理
                                             </Button>
-                                            <Button variant="outline" onClick={() => navigate('/dashboard/all-applications')}>
-                                                审批数据
+                                            <Button variant="outline" onClick={() => navigate('/dashboard/reports')}>
+                                                统计报表
                                             </Button>
                                         </div>
                                     </div>

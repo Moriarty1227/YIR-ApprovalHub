@@ -13,6 +13,8 @@ import com.approval.module.system.vo.DeptVo;
 import com.approval.module.system.vo.PermissionVo;
 import com.approval.module.system.vo.PostVo;
 import com.approval.module.system.vo.UserVo;
+import com.approval.module.system.vo.report.ReportDeptDetailVo;
+import com.approval.module.system.vo.report.ReportSummaryVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.swagger.v3.oas.annotations.Operation;
@@ -179,6 +181,22 @@ public class AdminController {
     public Result<List<PermissionVo>> getAllPermissions() {
         List<PermissionVo> permissions = adminService.getAllPermissions();
         return Result.success(permissions);
+    }
+
+    @Operation(summary = "管理员统计汇总")
+    @GetMapping("/reports/summary")
+    public Result<ReportSummaryVo> getReportSummary(@RequestParam(required = false) String month) {
+        ReportSummaryVo summary = adminService.getReportSummary(month);
+        return Result.success(summary);
+    }
+
+    @Operation(summary = "部门报表详情")
+    @GetMapping("/reports/dept-detail")
+    public Result<ReportDeptDetailVo> getDeptReportDetail(
+            @RequestParam Long deptId,
+            @RequestParam(required = false) String month) {
+        ReportDeptDetailVo detail = adminService.getDeptReportDetail(deptId, month);
+        return Result.success(detail);
     }
 
     private Long getUserIdFromToken(String token) {

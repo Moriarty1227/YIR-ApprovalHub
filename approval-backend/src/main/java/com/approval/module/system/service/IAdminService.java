@@ -8,6 +8,8 @@ import com.approval.module.system.vo.DeptVo;
 import com.approval.module.system.vo.PermissionVo;
 import com.approval.module.system.vo.PostVo;
 import com.approval.module.system.vo.UserVo;
+import com.approval.module.system.vo.report.ReportDeptDetailVo;
+import com.approval.module.system.vo.report.ReportSummaryVo;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface IAdminService {
@@ -49,4 +51,8 @@ public interface IAdminService {
     java.util.List<PostVo> getAllPosts();
 
     java.util.List<PermissionVo> getAllPermissions();
+
+    ReportSummaryVo getReportSummary(String month);
+
+    ReportDeptDetailVo getDeptReportDetail(Long deptId, String month);
 }

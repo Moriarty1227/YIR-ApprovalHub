@@ -9,6 +9,8 @@ import type {
     PostFormData,
     AssignPostData,
     Application,
+    ReportSummary,
+    ReportDeptDetail,
 } from '@/types'
 
 export const adminApi = {
@@ -85,6 +87,12 @@ export const adminApi = {
 
     getAllPermissions: () =>
         request.get<Permission[]>('/admin/permissions/all'),
+
+    getReportSummary: (params?: { month?: string }) =>
+        request.get<ReportSummary>('/admin/reports/summary', { params }),
+
+    getDeptReportDetail: (params: { deptId: number; month?: string }) =>
+        request.get<ReportDeptDetail>('/admin/reports/dept-detail', { params }),
 
     getAllApplications: (params: {
         pageNum?: number

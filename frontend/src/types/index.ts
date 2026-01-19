@@ -288,3 +288,71 @@ export interface AssignPostData {
     postId: number
     deptId?: number
 }
+
+export interface ReportDeptEmployeeStat {
+    deptId: number
+    deptName: string
+    userCount: number
+}
+
+export interface ReportPostEmployeeStat {
+    postId: number
+    postName: string
+    userCount: number
+}
+
+export interface ReportApplicationTypeStat {
+    total: number
+    approved: number
+    approvalRate: number
+}
+
+export interface ReportApplicationStats {
+    leave: ReportApplicationTypeStat
+    reimburse: ReportApplicationTypeStat
+}
+
+export interface ReportDeptMonthlyStat {
+    deptId: number
+    deptName: string
+    leaveTotal: number
+    reimburseTotal: number
+    approvalRate: number
+}
+
+export interface ReportSummary {
+    month: string
+    deptEmployeeStats: ReportDeptEmployeeStat[]
+    postEmployeeStats: ReportPostEmployeeStat[]
+    applicationStats: ReportApplicationStats
+    deptMonthlyStats: ReportDeptMonthlyStat[]
+}
+
+export interface ReportMemberLeaveDetail {
+    userId: number
+    realName: string
+    times: number
+    days: number
+}
+
+export interface ReportMemberReimburseDetail {
+    userId: number
+    realName: string
+    times: number
+    amount: number
+}
+
+export interface ReportDeptPostStat {
+    postId: number | null
+    postName: string
+    userCount: number
+}
+
+export interface ReportDeptDetail {
+    deptId: number
+    deptName: string
+    month: string
+    deptPostStats: ReportDeptPostStat[]
+    leaveDetails: ReportMemberLeaveDetail[]
+    reimburseDetails: ReportMemberReimburseDetail[]
+}
